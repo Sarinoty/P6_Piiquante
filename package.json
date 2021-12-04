@@ -1,0 +1,27 @@
+{
+  "name": "back",
+  "version": "1.0.0",
+  "description": "Back-end du P6 Developpeur Web",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sarinoty/P6_Piiquante.git"
+  },
+  "author": "Yohann Brionne",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sarinoty/P6_Piiquante/issues"
+  },
+  "homepage": "https://github.com/Sarinoty/P6_Piiquante#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.0.14",
+    "mongoose-unique-validator": "^3.0.0",
+    "multer": "^1.4.3"
+  }
+}
