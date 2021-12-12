@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const userRouter = require('./routes/user');
+const saucesRouter = require('./routes/sauce');
+const path = require('path');
 
 // Avant toute chose on se connecte à MongoDB :
 mongoose.connect('mongodb+srv://yo:Haggish879@cluster0.lkpd1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true})
@@ -18,7 +20,12 @@ app.use((req, res, next) => {
     next();
 });
 
+// Chemin statique pour les images :
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 // Vers le router du chemin utilisateur
 app.use('/api/auth', userRouter);
+// Vers le router des sauces :
+app.use('api/sauces', saucesRouter);
 
 module.exports = app;
