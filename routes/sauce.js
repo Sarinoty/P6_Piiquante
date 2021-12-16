@@ -4,7 +4,7 @@ const sauceController = require('../controllers/sauce');
 const authorize = require('../middleware/authorize');
 const multer = require('../middleware/multer');
 
-router.post(':id/like', authorize, sauceController.likeSauce);
+router.post('/:id/like', authorize, sauceController.likeSauce);
 router.delete('/:id', authorize, sauceController.deleteSauce);
 router.put('/:id', authorize, multer, sauceController.modifySauce);
 router.post('/', authorize, multer, sauceController.createSauce);

@@ -1,6 +1,106 @@
 const Sauce = require('../models/Sauce');
 const fs = require('fs');
 
+exports.likeSauce = (req, res, next) => {
+    switch (req.body.like) {
+        // En cas de clic sur dislike :
+        case -1:
+            Sauce.findOne({_id: req.params.id})
+                .then(sauce => {
+                    if(!sauce) {
+                        return res.status(404).json({error: new Error('Sauce non trouvée.')});
+                    }
+                    let toUpdate = {};
+                    // Si l'id de l'utilisateur n'est pas déjà présent dans la liste des dislike
+                    if (!sauce.usersDisliked.find(elt => elt === req.body.userId)) {
+                        // Si l'id de l'utilisateur n'est pas présent dans la liste des like
+                        if (!sauce.usersLiked.find(elt => elt === req.body.userId)) {
+                            toUpdate = {
+                                $inc: {dislikes: 1},
+                                $push: {usersDisliked: req.body.userId}
+                            };
+                        }
+                        // Si l'id de l'utilisateur est présent dans la liste des like (ça ne devrait théoriquement pas arriver si le front-end fonctionne correctement)
+                        else {
+                            toUpdate = {
+                                $inc: {dislikes: 1, likes: -1},
+                                $push: {usersDisliked: req.body.userId},
+                                $pull: {usersLiked: req.body.userId}
+                            };
+                        }
+                        Sauce.updateOne({_id: req.params.id}, toUpdate)
+                            .then(res.status(200).json({message: 'Votre vote a été comptabilisé !'}))
+                            .catch(error => res.status(400).json({error}));
+                    }
+                    else {
+                        return res.status(401).json({error: new Error('Requête non authorisée, vous avez déjà disliké cette sauce.')});
+                    }
+                })
+                .catch(error => res.status(500).json({error}));
+            break;
+        case 0:
+            Sauce.findOne({_id: req.params.id})
+                .then(sauce => {
+                    if(!sauce) {
+                        return res.status(404).json({error: new Error('Sauce non trouvée.')});
+                    }
+                    let toUpdate = {};
+                    // Si l'id de l'utilisateur est présent dans la liste des like :
+                    if (sauce.usersLiked.find(elt => elt === req.body.userId)) {
+                        toUpdate = {
+                            $inc: {likes: -1},
+                            $pull: {usersLiked: req.body.userId}
+                        }
+                    }
+                    // Si l'id de l'utilisateur est présent dans la liste des dislike :
+                    if (sauce.usersDisliked.find(elt => elt === req.body.userId)) {
+                        toUpdate = {
+                            $inc: {dislikes: -1},
+                            $pull: {usersDisliked: req.body.userId}
+                        }
+                    }
+                    Sauce.updateOne({_id: req.params.id}, toUpdate)
+                        .then(res.status(200).json({message: 'Vote annulé.'}))
+                        .catch(error => res.status(400).json({error}));
+                })
+                .catch(error => res.status(500).json({error}));
+            break;
+        case 1:
+            Sauce.findOne({_id: req.params.id})
+                .then(sauce => {
+                    if (!sauce) {
+                        return res.status(404).json({error: new Error('Sauce non trouvée')});
+                    }
+                    let toUpdate = {};
+                    if (!sauce.usersLiked.find(elt => elt === req.body.userId)) {
+                        if (!sauce.usersDisliked.find(elt => elt === req.body.userId)) {
+                            toUpdate = {
+                                $inc: {likes: 1},
+                                $push: {usersLiked: req.body.userId}
+                            };
+                        }
+                        else {
+                            toUpdate = {
+                                $inc: {likes: 1, dislikes: -1},
+                                $push: {usersLiked: req.body.userId},
+                                $pull: {usersDisliked: req.body.userId}
+                            }
+                        }
+                        Sauce.updateOne({_id: req.params.id}, toUpdate)
+                            .then(res.status(200).json({message: 'Votre vote a été comptabilisé !'}))
+                            .catch(error => res.status(400).json({error}));
+                    }
+                    else {
+                        return res.status(401).json({error: new Error('Requête non authorisée, vous avez déjà liké cette sauce.')});
+                    }
+                })
+                .catch(error => res.status(500).json({error}));
+            break;
+        default:
+            console.error('Quelques chose n\'a pas fonctionné...');
+    }
+};
+
 exports.deleteSauce = (req, res, next) => {
     Sauce.findOne({_id: req.params.id})
         .then(sauce => {
