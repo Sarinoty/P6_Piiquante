@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const helmet = require('helmet');
 const userRouter = require('./routes/user');
 const saucesRouter = require('./routes/sauce');
 const path = require('path');
@@ -19,7 +18,6 @@ app.use(express.json()); // = bodyParser = Donne accès au corps de la requête.
 
 // CORS
 app.use(cors());
-app.use(helmet());
 
 // Chemin statique pour les images :
 app.use('/images', express.static(path.join(__dirname, 'images')));
