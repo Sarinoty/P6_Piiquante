@@ -6,4 +6,5 @@ node_modules
 *.webp
 *.gif
 *.tiff
+*.psd
 .env

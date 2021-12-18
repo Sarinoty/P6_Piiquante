@@ -11,16 +11,16 @@ exports.likeSauce = (req, res, next) => {
                         return res.status(404).json({error: new Error('Sauce non trouvée.')});
                     }
                     let toUpdate = {};
-                    // Si l'id de l'utilisateur n'est pas déjà présent dans la liste des dislike
+                    // Si l'id de l'utilisateur n'est pas déjà présent dans la liste des dislikes
                     if (!sauce.usersDisliked.find(elt => elt === req.body.userId)) {
-                        // Si l'id de l'utilisateur n'est pas présent dans la liste des like
+                        // Si l'id de l'utilisateur n'est pas présent dans la liste des likes
                         if (!sauce.usersLiked.find(elt => elt === req.body.userId)) {
                             toUpdate = {
                                 $inc: {dislikes: 1},
                                 $push: {usersDisliked: req.body.userId}
                             };
                         }
-                        // Si l'id de l'utilisateur est présent dans la liste des like (ça ne devrait théoriquement pas arriver si le front-end fonctionne correctement)
+                        // Si l'id de l'utilisateur est présent dans la liste des likes (ça ne devrait théoriquement pas arriver si le front-end fonctionne correctement)
                         else {
                             toUpdate = {
                                 $inc: {dislikes: 1, likes: -1},
