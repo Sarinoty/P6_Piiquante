@@ -1,6 +1,6 @@
 # PIIQUANTE #
 
-Il s'agit ici du Back-end du projet n°6 de la formation développeur web d'OpenClassRooms. 
+Il s'agit ici du Back-end du projet n°6 de la formation Développeur Web d'OpenClassRooms. 
 
 ### Front-end ### 
 
