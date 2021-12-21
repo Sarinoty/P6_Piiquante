@@ -125,8 +125,23 @@ exports.deleteSauce = (req, res, next) => {
 exports.modifySauce = (req, res, next) => {
     // Dans le cas où la requête contient un fichier, on cherche l'imageUrl de la sauce existante et on supprime l'ancien fichier du dossier images
     if (req.file) {
-        //console.log(req.file);
-        Sauce.findOne({_id: req.params.id}, (e,sauce) => {
+        Sauce.findOne({_id: req.params.id})
+            .then(sauce => {
+                const fileToDelete = sauce.imageUrl.split('/images/')[1];
+                if (fileToDelete === req.file.filename) {
+                    console.log("*** " + fileToDelete + " ***");
+                    console.log("***** " + req.file.filename + " *****");
+                }
+                else {
+                    fs.unlink(`images/${fileToDelete}`, (e) => {
+                        if (e) {console.error('Echec de la suppression de l\'ancien fichier' + e);}
+                        else {console.log('Ancienne image supprimée avec succès.');}
+                    })
+                }
+            })
+            .catch(console.log('MongoDB tarde à répondre.'));
+        /* Sauce.findOne({_id: req.params.id}, (e,sauce) => {
+            
             if (e) {
                 console.error("La recherche de l'imageUrl d'origine a échoué...");
             }
@@ -139,12 +154,12 @@ exports.modifySauce = (req, res, next) => {
                 else {
                     //console.log(fileToDelete);
                     fs.unlink(`images/${fileToDelete}`, (e) => {
-                        if (e) {console.error(/* 'Echec de la suppression de l\'ancien fichier' */e);}
+                        if (e) {console.error(/* 'Echec de la suppression de l\'ancien fichier' e);}
                         else {console.log('Ancienne image supprimée avec succès.');}
                     })
                 }
             }
-        })
+        }) */
     }
     
     const sauceObject = req.file ?
