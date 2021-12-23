@@ -123,57 +123,30 @@ exports.deleteSauce = (req, res, next) => {
 };
 
 exports.modifySauce = (req, res, next) => {
-    // Dans le cas où la requête contient un fichier, on cherche l'imageUrl de la sauce existante et on supprime l'ancien fichier du dossier images
-    if (req.file) {
-        Sauce.findOne({_id: req.params.id})
-            .then(sauce => {
-                const fileToDelete = sauce.imageUrl.split('/images/')[1];
-                if (fileToDelete === req.file.filename) {
-                    console.log("*** " + fileToDelete + " ***");
-                    console.log("***** " + req.file.filename + " *****");
-                }
-                else {
-                    fs.unlink(`images/${fileToDelete}`, (e) => {
-                        if (e) {console.error('Echec de la suppression de l\'ancien fichier' + e);}
-                        else {console.log('Ancienne image supprimée avec succès.');}
-                    })
-                }
-            })
-            .catch(console.log('MongoDB tarde à répondre.'));
-        /* Sauce.findOne({_id: req.params.id}, (e,sauce) => {
-            
-            if (e) {
-                console.error("La recherche de l'imageUrl d'origine a échoué...");
-            }
-            else {
-                const fileToDelete = sauce.imageUrl.split('/images/')[1];
-                if (fileToDelete === req.file.filename) {
-                    console.log("*** " + fileToDelete + " ***");
-                    console.log("***** " + req.file.filename + " *****");
-                }
-                else {
-                    //console.log(fileToDelete);
-                    fs.unlink(`images/${fileToDelete}`, (e) => {
-                        if (e) {console.error(/* 'Echec de la suppression de l\'ancien fichier' e);}
-                        else {console.log('Ancienne image supprimée avec succès.');}
-                    })
-                }
-            }
-        }) */
-    }
-    
     const sauceObject = req.file ?
-    // S'il y a une image dans la requête en remplacement de celle existante dans le BDD :
         {
             ...JSON.parse(req.body.sauce),
             imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-        } : 
-    // S'il n'y a pas d'image dans la requête :
-        {...req.body};
-    
-    Sauce.updateOne({_id: req.params.id, userId: req.auth.userId}, {...sauceObject, _id:req.params.id})
-            .then(res.status(200).json({message: 'Sauce modifiée avec succès !'}))
-            .catch(error => res.status(400).json({error}));
+        } : {...req.body};
+
+    // Dans le cas où la requête contient un fichier, on cherche l'imageUrl de la sauce existante et on supprime l'ancien fichier du dossier images
+    if (req.file) {
+        Sauce.findOne({_id: req.params.id})
+            .then((sauce) => {
+                const fileToDelete = sauce.imageUrl.split('/images/')[1];
+                fs.unlink(`images/${fileToDelete}`, () => {
+                    Sauce.updateOne({_id: req.params.id, userId: req.auth.userId}, {...sauceObject, _id: req.params.id})
+                        .then(() => res.status(200).json({ message: 'Sauce modifiée avec succès !' }))
+                        .catch(error => res.status(400).json({error}));
+                })
+            })
+            .catch((error) => {res.status(500).json({ error })});
+    }
+    else {
+        Sauce.updateOne({_id: req.params.id, userId: req.auth.userId}, {...sauceObject, _id: req.params.id})
+        .then(() => res.status(200).json({ message: 'Sauce modifiée avec succès !' }))
+        .catch(error => res.status(400).json({error}));
+    }
 };
 
 exports.createSauce = (req, res, next) => {
