@@ -136,15 +136,15 @@ exports.modifySauce = (req, res, next) => {
                 const fileToDelete = sauce.imageUrl.split('/images/')[1];
                 fs.unlink(`images/${fileToDelete}`, () => {
                     Sauce.updateOne({_id: req.params.id, userId: req.auth.userId}, {...sauceObject, _id: req.params.id})
-                        .then(() => res.status(200).json({ message: 'Sauce modifiée avec succès !' }))
+                        .then(() => res.status(200).json({message: 'Sauce modifiée avec succès !'}))
                         .catch(error => res.status(400).json({error}));
                 })
             })
-            .catch((error) => {res.status(500).json({ error })});
+            .catch((error) => {res.status(500).json({error})});
     }
     else {
         Sauce.updateOne({_id: req.params.id, userId: req.auth.userId}, {...sauceObject, _id: req.params.id})
-        .then(() => res.status(200).json({ message: 'Sauce modifiée avec succès !' }))
+        .then(() => res.status(200).json({message: 'Sauce modifiée avec succès !'}))
         .catch(error => res.status(400).json({error}));
     }
 };
